@@ -1,0 +1,56 @@
+#include <string>
+#include <vector>
+#include <climits>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        if (s.empty() || t.empty() || s.length() < t.length()) {
+            return "";
+        }
+
+        // Frequency map for target string t
+        unordered_map<char, int> t_map;
+        for (char c : t) {
+            t_map[c]++;
+        }
+
+        int required = t_map.size(); // Number of unique characters needed
+        int formed = 0;              // Unique characters in current window
+        unordered_map<char, int> window_map;
+        
+        int l = 0, r = 0;
+        int min_len = INT_MAX;
+        int min_left = 0;
+
+        while (r < s.length()) {
+            char c = s[r];
+            window_map[c]++;
+
+            if (t_map.count(c) && window_map[c] == t_map[c]) {
+                formed++;
+            }
+
+            // Shrink window while it's valid
+            while (l <= r && formed == required) {
+                if (r - l + 1 < min_len) {
+                    min_len = r - l + 1;
+                    min_left = l;
+                }
+
+                char left_char = s[l];
+                window_map[left_char]--;
+                if (t_map.count(left_char) && window_map[left_char] < t_map[left_char]) {
+                    formed--;
+                }
+                l++;
+            }
+            r++;
+        }
+
+        return min_len == INT_MAX ? "" : s.substr(min_left, min_len);
+    }
+};
