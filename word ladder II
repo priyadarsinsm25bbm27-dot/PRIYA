@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_set>
+#include <unordered_map>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+        unordered_set<string> dict(wordList.begin(), wordList.end());
+        vector<vector<string>> result;
+        
+        // If endWord is not in the dictionary, no path is possible
+        if (dict.find(endWord) == dict.end()) return result;
+        
+        // BFS to find the shortest distance from beginWord to all other nodes
+        unordered_map<string, int> ladder;
+        queue<string> q;
+        q.push(beginWord);
+        ladder[beginWord] = 0;
+        
+        // Optimize: remove beginWord from dict if it exists
+        dict.erase(beginWord);
+        
+        bool found = false;
+        while (!q.empty()) {
+            string word = q.front();
+            q.pop();
+            
+            int level = ladder[word];
+            string nextWord = word;
+            
+            // Try changing each character to 'a'-'z'
+            for (int i = 0; i < nextWord.size(); ++i) {
+                char originalChar = nextWord[i];
+                for (char c = 'a'; c <= 'z'; ++c) {
+                    if (c == originalChar) continue;
+                    nextWord[i] = c;
+                    
+                    if (dict.count(nextWord)) {
+                        if (ladder.find(nextWord) == ladder.end()) {
+                            ladder[nextWord] = level + 1;
+                            q.push(nextWord);
+                        }
+                    }
+                }
+                nextWord[i] = originalChar; // backtrack
+            }
+        }
+        
+        // DFS to reconstruct the paths based on the ladder levels
+        if (ladder.find(endWord) != ladder.end()) {
+            vector<string> path;
+            path.push_back(endWord);
+            dfs(endWord, beginWord, ladder, path, result);
+        }
+        
+        return result;
+    }
+    
+private:
+    void dfs(string& word, const string& beginWord, unordered_map<string, int>& ladder, 
+             vector<string>& path, vector<vector<string>>& result) {
+        if (word == beginWord) {
+            reverse(path.begin(), path.end());
+            result.push_back(path);
+            reverse(path.begin(), path.end());
+            return;
+        }
+        
+        int level = ladder[word];
+        string prevWord = word;
+        
+        // Try changing each character to find the previous word in the path
+        for (int i = 0; i < prevWord.size(); ++i) {
+            char originalChar = prevWord[i];
+            for (char c = 'a'; c <= 'z'; ++c) {
+                if (c == originalChar) continue;
+                prevWord[i] = c;
+                
+                if (ladder.count(prevWord) && ladder[prevWord] == level - 1) {
+                    path.push_back(prevWord);
+                    dfs(prevWord, beginWord, ladder, path, result);
+                    path.pop_back(); // backtrack
+                }
+            }
+            prevWord[i] = originalChar;
+        }
+    }
+};
