@@ -1,0 +1,45 @@
+class Solution {
+public:
+    // Custom comparator for the min-heap
+    struct compare {
+        bool operator()(ListNode* a, ListNode* b) {
+            return a->val > b->val; 
+        }
+    };
+
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        // Min-priority queue to store the heads of all lists
+        priority_queue<ListNode*, vector<ListNode*>, compare> pq;
+
+        // Push the head of each non-empty list into the priority queue
+        for (ListNode* head : lists) {
+            if (head != nullptr) {
+                pq.push(head);
+            }
+        }
+
+        // Dummy node to simplify result list building
+        ListNode* dummy = new ListNode(0);
+        ListNode* tail = dummy;
+
+        while (!pq.empty()) {
+            // Get the smallest node from the heap
+            ListNode* smallestNode = pq.top();
+            pq.pop();
+
+            // Attach it to the merged list
+            tail->next = smallestNode;
+            tail = tail->next;
+
+            // If the popped node has a next node, push it into the heap
+            if (smallestNode->next != nullptr) {
+                pq.push(smallestNode->next);
+            }
+        }
+
+        ListNode* resultHead = dummy->next;
+        delete dummy; 
+        return resultHead;
+    }
+};
+
