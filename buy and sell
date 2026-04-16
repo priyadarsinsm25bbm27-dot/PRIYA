@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        // Initialize the four states:
+        // buy1: max profit after first buy (should be negative of price)
+        // sell1: max profit after first sell
+        // buy2: max profit after second buy
+        // sell2: max profit after second sell
+        int buy1 = INT_MIN, sell1 = 0;
+        int buy2 = INT_MIN, sell2 = 0;
+        
+        for (int p : prices) {
+            // First transaction
+            buy1 = max(buy1, -p);           // Minimize cost of first buy
+            sell1 = max(sell1, buy1 + p);   // Maximize profit of first sell
+            
+            // Second transaction
+            // We use the profit from the first sell to fund the second buy
+            buy2 = max(buy2, sell1 - p);    // Maximize "budget" for second buy
+            sell2 = max(sell2, buy2 + p);   // Maximize total profit after second sell
+        }
+        
+        return sell2;
+    }
+};
