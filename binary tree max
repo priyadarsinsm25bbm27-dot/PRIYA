@@ -1,0 +1,33 @@
+#include <algorithm>
+#include <climits>
+
+class Solution {
+private:
+    int maxSum = INT_MIN;
+
+    int dfs(TreeNode* node) {
+        if (!node) return 0;
+
+        // Recursively get max path gains from children.
+        // We use max(0, ...) because if a path sum is negative, 
+        // we'd rather not include it (effectively picking a path of length 0).
+        int leftGain = std::max(dfs(node->left), 0);
+        int rightGain = std::max(dfs(node->right), 0);
+
+        // Price of the path that "peaks" at this node
+        int currentPathSum = node->val + leftGain + rightGain;
+
+        // Update the global maximum encountered so far
+        maxSum = std::max(maxSum, currentPathSum);
+
+        // Return the maximum gain this node can contribute to its parent
+        return node->val + std::max(leftGain, rightGain);
+    }
+
+public:
+    int maxPathSum(TreeNode* root) {
+        maxSum = INT_MIN;
+        dfs(root);
+        return maxSum;
+    }
+};
