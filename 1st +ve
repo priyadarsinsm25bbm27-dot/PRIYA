@@ -1,0 +1,21 @@
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int:
+        n = len(nums)
+        
+        for i in range(n):
+            # While the current number is in the valid range [1, n]
+            # and it's not already at its correct "target" index (nums[i] - 1),
+            # swap it into its correct place.
+            while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:
+                # We swap nums[i] with the element at its target position
+                target_idx = nums[i] - 1
+                nums[i], nums[target_idx] = nums[target_idx], nums[i]
+        
+        # After rearranging, the first index 'i' where nums[i] != i + 1
+        # tells us that 'i + 1' is the missing positive integer.
+        for i in range(n):
+            if nums[i] != i + 1:
+                return i + 1
+        
+        # If all positions are filled correctly (1 to n), the answer is n + 1.
+        return n + 1
