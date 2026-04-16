@@ -1,0 +1,27 @@
+#include <vector>
+#include <algorithm>
+
+class Solution {
+public:
+    int findMin(std::vector<int>& nums) {
+        int left = 0;
+        int right = nums.size() - 1;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] < nums[right]) {
+                // The minimum is in the left half, including mid
+                right = mid;
+            } else if (nums[mid] > nums[right]) {
+                // The minimum is in the right half, excluding mid
+                left = mid + 1;
+            } else {
+                // nums[mid] == nums[right]: Cannot determine side due to duplicates
+                // Shrink the search space by moving the right pointer
+                right--;
+            }
+        }
+        return nums[left];
+    }
+};
